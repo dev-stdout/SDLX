@@ -17,4 +17,7 @@ void			SDLX_screen_reset(SDL_Renderer *renderer, SDL_Color *bg_color);
 
 void			SDLX_close(void);
 
+void 			SDLX_RenderMessage(TTF_Font *font, char *msg, const SDL_Rect *src, const SDL_Rect *dst);
+char			*SDLX_strjoin(char const *s1, char const *s2);
+
 #endif
