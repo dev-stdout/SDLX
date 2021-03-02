@@ -1,35 +1,33 @@
-#include "SDLX.h"
+#include "SDLX/SDLX.h"
 
-void	SDLX_start(SDLX_Display *dest)
+static SDLX_Display display;
+void SDLX_Init(void);
+
+void	SDLX_Close(void)
 {
-	SDL_Window	*window;
+	SDL_DestroyWindow(SDLX_DisplayGet()->window);
+	SDL_Quit();
+}
 
+void	SDLX_Start()
+{
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
-	window = SDL_CreateWindow(
+	SDLX_Init();
+	atexit(SDLX_Close);
+}
+
+SDLX_Display	*SDLX_DisplayGet(void) {return &display;}
+
+void 			SDLX_BackgroundSet(SDL_Texture *bg) {display.background = bg;}
+
+void			SDLX_DisplaySet(void)
+{
+	display.window = SDL_CreateWindow(
 				WIN_TITLE,
 				WIN_X, WIN_Y,
 				WIN_W, WIN_H,
 				SDL_WINDOW_SHOWN
 	);
-	dest->window = window;
-	dest->renderer = SDL_CreateRenderer(window, -1, 0);
-
-	atexit(SDLX_close);
-}
-
-void	SDLX_close(void)
-{
-	SDL_DestroyWindow(SDLX_GetDisplay()->window);
-	SDL_Quit();
-}
-
-SDLX_Display	*SDLX_GetDisplay(void)
-{
-	static SDLX_Display	display;
-
-	if (display.window == NULL)
-		SDLX_start(&display);
-
-	return (&display);
+	display.renderer = SDL_CreateRenderer(display.window, -1, 0);
 }
