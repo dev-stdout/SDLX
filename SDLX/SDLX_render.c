@@ -1,34 +1,48 @@
-/***************************************************************************
- * FILENAME:    SDLX_render.c
- * DESCRIPTION: Utility functions for rendering the screen.
- *
- * ENVIRONMENT:
- *     macOS Cataline 10.15.7
- *     Visual Studio Code 1.30
- * AUTHORS:
- *     Kevin Colour
- * DATES:
- *     Created: 24Jan2021
-***************************************************************************/
+#include "SDLX/SDLX.h"
 
-#include "SDLX.h"
-
-// The function below will be called at the end of each draw stage
-// and display the renderer onto the window, and prep it for a new
-// draw stage.
-
-void	SDLX_screen_reset(SDL_Renderer *renderer, SDL_Color *bg_color)
+void	SDLX_ResetWindow(void)
 {
-	// SDL_Log("NEW FRAME DRAWN");
+	SDLX_Display *display;
 
-	SDL_RenderPresent(renderer);
-	if (bg_color != NULL)
-		SDL_SetRenderDrawColor(renderer, bg_color->r, bg_color->g, bg_color->b, bg_color->a);
-	// else
-	// 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	display = SDLX_DisplayGet();
+	
+	SDL_RenderClear(display->renderer);
+	SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 0);
+	if (display->background)
+		SDL_RenderCopy(display->renderer, display->background, NULL, NULL);
+}
 
-	SDL_RenderClear(renderer);
+void SDLX_RenderMessage(TTF_Font *font, char *msg, const SDL_Rect *src, const SDL_Rect *dst)
+{
+	SDL_Surface *message;
+	SDLX_Display *display;
 
-	// Line below might be unecessary.
-	// SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	display = SDLX_DisplayGet();
+	message = TTF_RenderText_Solid(font,
+						msg,
+						(SDL_Color){255, 255, 255, 255});
+	SDL_RenderCopy(display->renderer,
+					SDL_CreateTextureFromSurface(display->renderer, message),
+					src, dst);
+	SDL_FreeSurface(message);
+}
+
+void	SDLX_RenderQueueDisplay(SDLX_RenderQueue *queue, SDLX_Display *display)
+{
+	size_t i;
+
+	i = 0;
+	SDL_Log("Queue has %zu\n", queue->amount);
+	while (i < queue->amount)
+	{
+		SDL_RenderCopyEx(display->renderer,
+						queue->sprites[i].spriteSheet,
+						queue->sprites[i].srcptr,
+						queue->sprites[i].dstptr,
+						queue->sprites[i].angle,
+						&queue->sprites[i].center,
+						queue->sprites[i].flip);
+		i++;
+	}
+	queue->amount = 0;
 }
