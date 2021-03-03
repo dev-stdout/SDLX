@@ -40,6 +40,5 @@ int main()
 		SDLX_RenderQueueDisplay(SDLX_RenderQueueFetch(NULL)[0], display);
 		SDL_RenderPresent(display->renderer);
 		SDLX_FPSAdjust();
-		//SDL_Log("I %d\n", i);
 	}
 }
